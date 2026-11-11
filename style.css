@@ -75,3 +75,12 @@ aside.on{transform:none}
 #toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:.45em 1em;border-radius:99px;font-size:.88rem;opacity:0;transition:opacity .2s;pointer-events:none;z-index:20}
 #toast.on{opacity:.95}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* 语音调节 */
+#sheet{max-height:88vh;overflow-y:auto;overscroll-behavior:contain}
+.setTitle{font-size:.9rem;color:var(--acc);margin:16px 0 4px;padding-top:8px;border-top:1px solid var(--line)}
+.voiceRow{align-items:center;flex-wrap:wrap}
+.voiceRow>span{display:flex;justify-content:space-between;gap:12px;width:100%}
+.voiceRow output{color:var(--acc);font-variant-numeric:tabular-nums;font-weight:600}
+.voiceRow select{max-width:100%;min-width:0;flex:1}
+.voiceRow input[type=range]{width:100%;accent-color:var(--acc);margin:4px 0}
