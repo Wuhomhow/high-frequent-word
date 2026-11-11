@@ -178,8 +178,8 @@ function openDrawer(on){
   $('#drawer').classList.toggle('on',on);$('#mask').classList.toggle('on',on||$('#sheet').classList.contains('on'));
   if(on){const c=tocEl.querySelector('.cur');if(c)c.scrollIntoView({block:'center'})}
 }
-function openSheet(on){$('#sheet').classList.toggle('on',on);$('#mask').classList.toggle('on',on||$('#drawer').classList.contains('on'))}
-function closeAll(){$('#drawer').classList.remove('on');$('#sheet').classList.remove('on');$('#mask').classList.remove('on')}
+function openSheet(on){$('#sheet').classList.toggle('on',on);$('#sheet').setAttribute('aria-hidden',String(!on));$('#mask').classList.toggle('on',on||$('#drawer').classList.contains('on'))}
+function closeAll(){$('#drawer').classList.remove('on');$('#sheet').classList.remove('on');$('#sheet').setAttribute('aria-hidden','true');$('#mask').classList.remove('on')}
 
 /* 事件 */
 $('#card').addEventListener('mouseover',e=>{const x=e.target.closest('.t');if(x)showTip(x)});
@@ -194,7 +194,7 @@ $('#card').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.t
 tocEl.addEventListener('click',e=>{const b=e.target.closest('button');if(b){go(+b.dataset.id,true);closeAll()}});
 $('#chips').addEventListener('click',e=>{const b=e.target.closest('button');if(b){st.filter=b.dataset.f;save();render()}});
 $('#q').addEventListener('input',updToc);
-$('#btnToc').onclick=()=>openDrawer(true);$('#btnSet').onclick=()=>openSheet(true);$('#mask').onclick=closeAll;
+$('#btnToc').onclick=()=>openDrawer(true);$('#btnSet').onclick=()=>openSheet(true);$('#closeSheet').onclick=closeAll;$('#mask').onclick=closeAll;
 $('#prev').onclick=()=>step(-1);$('#next').onclick=()=>step(1);
 function setRange(i){
   let a=parseInt($('#r'+i+'Min').value,10),b=parseInt($('#r'+i+'Max').value,10);
