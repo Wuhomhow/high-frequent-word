@@ -7,7 +7,7 @@ const defaultRanges = () => {
 };
 const $=s=>document.querySelector(s);
 const KEY='vocab-high-freq-v1';
-let st={cur:1,star:{},done:{},nog:false,auto:false,shuf:false,showAns:false,size:1,theme:'auto',filter:'all',ranges:defaultRanges()};
+let st={cur:1,star:{},done:{},nog:false,auto:false,shuf:false,showAns:false,size:1,theme:'auto',filter:'all',ranges:defaultRanges(),voiceRate:.9,voiceVolume:1,voicePitch:1,voiceName:''};
 try{Object.assign(st,JSON.parse(localStorage.getItem(KEY)||'{}'))}catch(e){}
 if(!Array.isArray(st.ranges)||st.ranges.length!==3)st.ranges=defaultRanges();
 st.ranges=st.ranges.map(r=>Array.isArray(r)&&r.length===2?r:[1,W.length]);
@@ -86,10 +86,27 @@ function hl(s,word){
 }
 const plain=s=>s.replace(/\([^()]*[\u4e00-\u9fff][^()]*\)/g,'').replace(/\s+/g,' ').trim();
 
+let availableVoices=[];
+function loadVoices(){
+  if(!('speechSynthesis' in window))return;
+  availableVoices=speechSynthesis.getVoices().filter(v=>/^en(-|_)/i.test(v.lang));
+  const sel=$('#oVoice'),current=st.voiceName;
+  sel.innerHTML='<option value="">系统默认英语语音</option>'+availableVoices.map(v=>'<option value="'+esc(v.name)+'">'+esc(v.name)+'（'+esc(v.lang)+'）</option>').join('');
+  if(current&&availableVoices.some(v=>v.name===current))sel.value=current;
+  else if(current){st.voiceName='';sel.value='';save()}
+}
+if('speechSynthesis' in window){
+  loadVoices();
+  speechSynthesis.addEventListener?.('voiceschanged',loadVoices);
+}
 function speak(t){
   if(!('speechSynthesis' in window))return toast('此浏览器不支持朗读');
   speechSynthesis.cancel();
-  const u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=.9;speechSynthesis.speak(u);
+  const u=new SpeechSynthesisUtterance(t);u.lang='en-US';
+  u.rate=Number(st.voiceRate)||.9;u.volume=Number(st.voiceVolume);u.pitch=Number(st.voicePitch)||1;
+  const voice=availableVoices.find(v=>v.name===st.voiceName);
+  if(voice)u.voice=voice;
+  speechSynthesis.speak(u);
 }
 let shown=false;
 const cur=()=>W[st.cur-1];
@@ -191,6 +208,16 @@ $('#rAll').onclick=()=>{st.ranges=defaultRanges();[1,2,3].forEach(i=>{$('#r'+i+'
 $('#oNog').onchange=e=>{st.nog=e.target.checked;save();render()};
 $('#oAns').onchange=e=>{st.showAns=e.target.checked;save()};
 $('#oAuto').onchange=e=>{st.auto=e.target.checked;save()};
+function updateVoiceSetting(key,value){
+  st[key]=Number(value);save();
+  const output={voiceRate:'#voiceRateVal',voiceVolume:'#voiceVolumeVal',voicePitch:'#voicePitchVal'}[key];
+  if(output)$(output).textContent=key==='voiceRate'?st[key].toFixed(1)+'×':Math.round(st[key]*100)+'%';
+}
+$('#oVoice').onchange=e=>{st.voiceName=e.target.value;save()};
+$('#oVoiceRate').oninput=e=>updateVoiceSetting('voiceRate',e.target.value);
+$('#oVoiceVolume').oninput=e=>updateVoiceSetting('voiceVolume',e.target.value);
+$('#oVoicePitch').oninput=e=>updateVoiceSetting('voicePitch',e.target.value);
+$('#voiceTest').onclick=()=>speak('Hello! This is a voice test. You can adjust the voice settings to find a comfortable sound.');
 $('#oShuf').onchange=e=>{st.shuf=e.target.checked;save()};
 $('#oSize').oninput=e=>{st.size=+e.target.value;document.documentElement.style.setProperty('--fs',st.size);save()};
 $('#oTheme').onchange=e=>{st.theme=e.target.value;applyTheme();save()};
@@ -218,6 +245,8 @@ mn.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-sx,dy=e.
   if(h>=1&&h<=W.length)st.cur=h;
   if(!(st.cur>=1&&st.cur<=W.length))st.cur=1;
   $('#oNog').checked=st.nog;$('#oAuto').checked=st.auto;$('#oAns').checked=st.showAns;shown=st.showAns;$('#oShuf').checked=st.shuf;
+  $('#oVoiceRate').value=st.voiceRate;$('#oVoiceVolume').value=st.voiceVolume;$('#oVoicePitch').value=st.voicePitch;
+  $('#voiceRateVal').textContent=Number(st.voiceRate).toFixed(1)+'×';$('#voiceVolumeVal').textContent=Math.round(st.voiceVolume*100)+'%';$('#voicePitchVal').textContent=Math.round(st.voicePitch*100)+'%';
   [1,2,3].forEach(i=>{$('#r'+i+'Min').value=st.ranges[i-1][0];$('#r'+i+'Max').value=st.ranges[i-1][1]});$('#oSize').value=st.size;$('#oTheme').value=st.theme;
   document.documentElement.style.setProperty('--fs',st.size);applyTheme();render();
 })();
