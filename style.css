@@ -65,9 +65,16 @@ aside.on{transform:none}
 #toc button.cur{background:var(--acc);color:var(--accink)}#toc button.cur em{color:inherit}
 #toc button.d{opacity:.5}
 #toc .none{grid-column:1/-1;color:var(--mute);padding:1em}
-#sheet{left:50%;top:50%;width:min(420px,92vw);transform:translate(-50%,-46%);opacity:0;pointer-events:none;border-radius:14px;padding:20px;transition:.2s}
-#sheet.on{transform:translate(-50%,-50%);opacity:1;pointer-events:auto}
-#sheet h2{margin:0 0 12px;font-size:1.05rem}
+#sheet{left:50%;top:50%;width:min(420px,92vw);max-height:min(88vh,760px);overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable;transform:translate(-50%,-46%) scale(.96);opacity:0;pointer-events:none;border-radius:14px;padding:16px 20px 20px;transition:transform .28s cubic-bezier(.2,.8,.2,1),opacity .22s ease; -webkit-overflow-scrolling:touch}
+#sheet.on{transform:translate(-50%,-50%) scale(1);opacity:1;pointer-events:auto}
+#sheet::-webkit-scrollbar{width:8px}
+#sheet::-webkit-scrollbar-track{background:transparent;margin:10px 0}
+#sheet::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--mute) 45%,transparent);border-radius:99px;border:2px solid var(--card)}
+#sheet{scrollbar-width:thin;scrollbar-color:color-mix(in srgb,var(--mute) 45%,transparent) transparent}
+.sheetHead{position:sticky;top:-16px;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:12px;margin:-16px -20px 8px;padding:14px 16px 10px 20px;background:var(--card);border-bottom:1px solid var(--line)}
+#sheet h2{margin:0;font-size:1.05rem}
+#closeSheet{width:34px;height:34px;flex:none;padding:0;border:0;border-radius:50%;font-size:1.6rem;line-height:1;color:var(--mute)}
+#closeSheet:hover{background:color-mix(in srgb,var(--acc) 12%,transparent);color:var(--acc)}
 .row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:.6em 0;border-bottom:1px solid var(--line)}
 .row select{font:inherit;padding:.3em;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:6px}
 .rng{display:flex;align-items:center;gap:6px}.rng input{width:4.6em;font:inherit;text-align:center;padding:.3em;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
@@ -77,7 +84,6 @@ aside.on{transform:none}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 
 /* 语音调节 */
-#sheet{max-height:88vh;overflow-y:auto;overscroll-behavior:contain}
 .setTitle{font-size:.9rem;color:var(--acc);margin:16px 0 4px;padding-top:8px;border-top:1px solid var(--line)}
 .voiceRow{align-items:center;flex-wrap:wrap}
 .voiceRow>span{display:flex;justify-content:space-between;gap:12px;width:100%}
