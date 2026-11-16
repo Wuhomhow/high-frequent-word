@@ -90,3 +90,31 @@ aside.on{transform:none}
 .voiceRow output{color:var(--acc);font-variant-numeric:tabular-nums;font-weight:600}
 .voiceRow select{max-width:100%;min-width:0;flex:1}
 .voiceRow input[type=range]{width:100%;accent-color:var(--acc);margin:4px 0}
+
+/* 例句单词双击跳转转场 */
+.wordToken.jump-target{
+  position:relative;
+  z-index:1;
+  border-radius:4px;
+  background:color-mix(in srgb,var(--acc) 22%,transparent);
+  box-shadow:0 0 0 2px color-mix(in srgb,var(--acc) 22%,transparent);
+  animation:example-word-target .16s ease-out both;
+}
+#card.jump-pending{pointer-events:none}
+#card.jump-out{animation:card-jump-out .1s ease-in both}
+#card.jump-in{animation:card-jump-in .18s cubic-bezier(.2,.75,.25,1) both}
+@keyframes example-word-target{
+  from{background:transparent;box-shadow:0 0 0 0 transparent}
+  to{background:color-mix(in srgb,var(--acc) 22%,transparent);box-shadow:0 0 0 2px color-mix(in srgb,var(--acc) 22%,transparent)}
+}
+@keyframes card-jump-out{
+  from{opacity:1;transform:translateY(0)}
+  to{opacity:0;transform:translateY(-8px)}
+}
+@keyframes card-jump-in{
+  from{opacity:0;transform:translateY(8px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@media(prefers-reduced-motion:reduce){
+  .wordToken.jump-target,#card.jump-out,#card.jump-in{animation:none!important}
+}
