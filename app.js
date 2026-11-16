@@ -46,6 +46,29 @@ W.forEach(o=>{if(/n['’]t/i.test(o.w)){NT=o.id;return}const b=baseOf(o.w);if(/^
 W.forEach(o=>{const b=baseOf(o.w);if(/^[a-z]+$/.test(b))FORM[b]=o.id});
 const vcache={};
 const vset=w=>vcache[w]||(vcache[w]=new Set(variants(baseOf(w))));
+const WORD_ID={};
+W.forEach(o=>{
+  const key=baseOf(o.w).replace(/[^a-z]/g,'');
+  if(key&&!WORD_ID[key])WORD_ID[key]=o.id;
+});
+function wordIdOf(tok){
+  const lo=tok.toLowerCase();
+  let id=FORM[lo];
+  if(id===undefined){
+    const key=lo.replace(/[^a-z]/g,'');
+    id=WORD_ID[key];
+  }
+  if(id===undefined&&/['’]/.test(lo)){
+    if(/n['’]t$/.test(lo)){
+      let s=lo.slice(0,-3);
+      if(s==='ca')s='can';else if(s==='wo')s='will';
+      id=FORM[s];
+    }else{
+      id=FORM[lo.split(/['’]/)[0]];
+    }
+  }
+  return id===undefined?null:id;
+}
 const TOK=/[A-Za-z]+(?:['’][A-Za-z]+)*/g;
 const GL=/(\([^()]*[\u4e00-\u9fff][^()]*\))/;
 function tipOf(tok){
@@ -71,14 +94,14 @@ function hl(s,word){
       const tok=m[0],lo=tok.toLowerCase();
       out+=esc(p.slice(last,m.index));last=m.index+tok.length;
       const glossed=glossNext&&k===toks.length-1&&!p.slice(last).trim();
-      const tip=glossed?null:tipOf(tok);
+      const tip=glossed?null:tipOf(tok),wordId=wordIdOf(tok);
       let h=esc(tok);
-      if(tip)h='<span class="t" data-tip="'+esc(tip)+'">'+h+'</span>';
       if(nt&&/n['’]t$/.test(lo)){
         const cut=tok.length-3;
         h=esc(tok.slice(0,cut))+'<mark>'+esc(tok.slice(cut))+'</mark>';
-        if(tip)h='<span class="t" data-tip="'+esc(tip)+'">'+h+'</span>';
       }else if(set.has(lo)||set.has(lo.split(/['’]/)[0]))h='<mark>'+h+'</mark>';
+      const cls=tip?'wordToken t':'wordToken';
+      h='<span class="'+cls+'"'+(wordId?' data-word-id="'+wordId+'"':'')+(tip?' data-tip="'+esc(tip)+'"':'')+'>'+h+'</span>';
       out+=h;
     });
     return out+esc(p.slice(last));
@@ -184,9 +207,34 @@ function closeAll(){$('#drawer').classList.remove('on');$('#sheet').classList.re
 /* 事件 */
 $('#card').addEventListener('mouseover',e=>{const x=e.target.closest('.t');if(x)showTip(x)});
 $('#card').addEventListener('mouseout',e=>{if(e.target.closest('.t'))hideTip()});
+let exampleClickTimer=null,pendingExampleWord=null,pendingExampleAt=0;
+const EXAMPLE_CLICK_DELAY=320;
+function jumpFromExampleWord(el){
+  const id=Number(el&&el.dataset.wordId);
+  if(id>0&&W[id-1]){go(id,false);return}
+  const word=el&&el.textContent.trim();
+  toast(word?'词库暂未收录：'+word:'词库中没有对应词条');
+}
 $('#card').addEventListener('click',e=>{
-  const li=e.target.closest('li');
-  if(li){const x=e.target.closest('.t');if(x)showTip(x,1600);return speak(plain(cur().e[li.dataset.i]))}
+  const li=e.target.closest('ol.ex li[data-i]');
+  if(li){
+    const word=e.target.closest('.wordToken'),now=Date.now();
+    const isDouble=!!word&&word===pendingExampleWord&&now-pendingExampleAt<=EXAMPLE_CLICK_DELAY;
+    if(exampleClickTimer){clearTimeout(exampleClickTimer);exampleClickTimer=null}
+    if(isDouble){
+      pendingExampleWord=null;pendingExampleAt=0;
+      jumpFromExampleWord(word);
+      return;
+    }
+    pendingExampleWord=word;pendingExampleAt=now;
+    const tip=e.target.closest('.t'),sentence=plain(cur().e[li.dataset.i]);
+    exampleClickTimer=setTimeout(()=>{
+      exampleClickTimer=null;pendingExampleWord=null;pendingExampleAt=0;
+      if(tip&&tip.isConnected)showTip(tip,1600);
+      speak(sentence);
+    },EXAMPLE_CLICK_DELAY);
+    return;
+  }
   const a=e.target.closest('[data-a]');if(!a)return;
   ({ans:()=>{shown=!shown;render()},star:()=>toggle(st.star),done:()=>toggle(st.done),say:speakWord,gloss:()=>{st.nog=!st.nog;$('#oNog').checked=st.nog;save();render()}})[a.dataset.a]();
 });
