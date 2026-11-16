@@ -207,13 +207,41 @@ function closeAll(){$('#drawer').classList.remove('on');$('#sheet').classList.re
 /* 事件 */
 $('#card').addEventListener('mouseover',e=>{const x=e.target.closest('.t');if(x)showTip(x)});
 $('#card').addEventListener('mouseout',e=>{if(e.target.closest('.t'))hideTip()});
-let exampleClickTimer=null,pendingExampleWord=null,pendingExampleAt=0;
+let exampleClickTimer=null,pendingExampleWord=null,pendingExampleAt=0,exampleJumping=false;
 const EXAMPLE_CLICK_DELAY=320;
 function jumpFromExampleWord(el){
   const id=Number(el&&el.dataset.wordId);
-  if(id>0&&W[id-1]){go(id,false);return}
-  const word=el&&el.textContent.trim();
-  toast(word?'词库暂未收录：'+word:'词库中没有对应词条');
+  if(!(id>0&&W[id-1])){
+    const word=el&&el.textContent.trim();
+    toast(word?'词库暂未收录：'+word:'词库中没有对应词条');
+    return;
+  }
+  if(id===st.cur){toast('当前已经是该单词');return}
+  if(exampleJumping)return;
+
+  const card=$('#card');
+  const reduceMotion=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduceMotion){go(id,false);return}
+
+  exampleJumping=true;
+  el.classList.add('jump-target');
+  card.classList.remove('jump-in','jump-out');
+  card.classList.add('jump-pending');
+
+  window.setTimeout(()=>{
+    card.classList.add('jump-out');
+    window.setTimeout(()=>{
+      card.classList.remove('jump-pending','jump-out');
+      go(id,false);
+      card.classList.remove('jump-in');
+      void card.offsetWidth;
+      card.classList.add('jump-in');
+      window.setTimeout(()=>{
+        card.classList.remove('jump-in');
+        exampleJumping=false;
+      },200);
+    },100);
+  },55);
 }
 $('#card').addEventListener('click',e=>{
   const li=e.target.closest('ol.ex li[data-i]');
