@@ -12,7 +12,7 @@
   <button id="btnToc" aria-label="打开目录">目录</button>
   <button id="btnSet" aria-label="设置">设置</button>
 </header>
-<main id="main"><button id="prev" class="arr" aria-label="上一个" title="上一个（←）"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><article id="card" aria-live="polite"></article><div id="pos"><b id="posN"></b><span id="posT"></span></div><button id="next" class="arr" aria-label="下一个" title="下一个（→）"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button></main>
+<main id="main"><button id="prev" class="arr" aria-label="返回上一个查看的单词" title="上一个查看记录（←）"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><article id="card" aria-live="polite"></article><div id="pos"><b id="posN"></b><span id="posT"></span></div><button id="next" class="arr" aria-label="下一个" title="下一个（→）"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button></main>
 <div id="mask"></div>
 <aside id="drawer" aria-label="目录">
   <div class="dh">
@@ -40,7 +40,7 @@
   <label class="row">字号<input type="range" id="oSize" min="0.85" max="1.4" step="0.05"></label>
   <label class="row">主题<select id="oTheme"><option value="auto">跟随系统</option><option value="light">浅色</option><option value="dark">深色</option></select></label>
   <div class="row"><span>清空收藏和已掌握记录</span><button id="oReset">清空</button></div>
-  <p class="keys">快捷键：← → 切换　A 或 Enter 查看中文　S 朗读　F 收藏　M 已掌握　H 中文提示　R 随机　T 目录　Esc 关闭。<br>手机上可左右滑动切换；单击例句可朗读，双击其中的单词可跳转到对应词条（仅限词库已收录的单词）；把鼠标移到例句中没标中文的单词上（手机上点一下），会显示它在词表中的序号。</p>
+  <p class="keys">快捷键：← 返回上一个查看的单词　→ 下一个单词　A 或 Enter 查看中文　S 朗读　F 收藏　M 已掌握　H 中文提示　R 随机　T 目录　Esc 关闭。<br>手机上可左右滑动切换；单击例句可朗读，双击其中的单词可跳转到对应词条（仅限词库已收录的单词）；把鼠标移到例句中没标中文的单词上（手机上点一下），会显示它在词表中的序号。</p>
 </div>
 <div id="toast"></div>
 <div id="tip"></div>
