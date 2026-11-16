@@ -154,11 +154,30 @@ function render(){
   document.body.classList.toggle('nog',st.nog);
   updToc();
 }
-function go(id,say){
-  id=Math.max(1,Math.min(W.length,id|0));st.cur=id;shown=st.showAns;save();
+let viewHistory=[],viewHistoryIndex=-1;
+function recordView(id){
+  if(viewHistoryIndex<0){viewHistory=[id];viewHistoryIndex=0;return}
+  if(viewHistory[viewHistoryIndex]===id)return;
+  viewHistory=viewHistory.slice(0,viewHistoryIndex+1);
+  viewHistory.push(id);
+  viewHistoryIndex=viewHistory.length-1;
+}
+function showWord(id,say){
+  st.cur=id;shown=st.showAns;save();
   try{history.replaceState(null,'','#'+id)}catch(e){}
   render();$('#main').scrollTop=0;
   if(say&&st.auto)speakWord();
+}
+function go(id,say){
+  id=Math.max(1,Math.min(W.length,id|0));
+  if(viewHistoryIndex<0)recordView(st.cur);
+  if(id!==st.cur)recordView(id);
+  showWord(id,say);
+}
+function previousViewed(){
+  if(viewHistoryIndex<=0)return toast('没有更早的查看记录');
+  viewHistoryIndex--;
+  showWord(viewHistory[viewHistoryIndex],true);
 }
 function step(d){
   const L=list();if(!L.length)return toast('当前筛选下没有单词');
@@ -271,7 +290,7 @@ tocEl.addEventListener('click',e=>{const b=e.target.closest('button');if(b){go(+
 $('#chips').addEventListener('click',e=>{const b=e.target.closest('button');if(b){st.filter=b.dataset.f;save();render()}});
 $('#q').addEventListener('input',updToc);
 $('#btnToc').onclick=()=>openDrawer(true);$('#btnSet').onclick=()=>openSheet(true);$('#closeSheet').onclick=closeAll;$('#mask').onclick=closeAll;
-$('#prev').onclick=()=>step(-1);$('#next').onclick=()=>step(1);
+$('#prev').onclick=previousViewed;$('#next').onclick=()=>step(1);
 function setRange(i){
   let a=parseInt($('#r'+i+'Min').value,10),b=parseInt($('#r'+i+'Max').value,10);
   if(!(a>=1))a=1;if(!(b>=1))b=W.length;
@@ -304,7 +323,7 @@ document.addEventListener('keydown',e=>{
   if(e.target.matches('input,select')||e.ctrlKey||e.metaKey||e.altKey)return;
   const k=e.key.toLowerCase();
   if(k==='escape')closeAll();
-  else if(e.key==='ArrowRight')step(1);else if(e.key==='ArrowLeft')step(-1);
+  else if(e.key==='ArrowRight')step(1);else if(e.key==='ArrowLeft')previousViewed();
   else if(k==='s'||e.key===' '){e.preventDefault();speakWord()}
   else if(k==='a'||(e.key==='Enter'&&e.target===document.body)){e.preventDefault();shown=!shown;render()}
   else if(k==='f')toggle(st.star);else if(k==='m')toggle(st.done);
@@ -313,13 +332,14 @@ document.addEventListener('keydown',e=>{
 });
 let sx=0,sy=0;const mn=$('#main');
 mn.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY},{passive:true});
-mn.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;if(Math.abs(dx)>60&&Math.abs(dy)<50)step(dx<0?1:-1)});
+mn.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;if(Math.abs(dx)>60&&Math.abs(dy)<50){if(dx<0)step(1);else previousViewed()}});
 
 /* 初始化 */
 (function(){
   const h=parseInt(location.hash.slice(1),10);
   if(h>=1&&h<=W.length)st.cur=h;
   if(!(st.cur>=1&&st.cur<=W.length))st.cur=1;
+  recordView(st.cur);
   $('#oNog').checked=st.nog;$('#oAuto').checked=st.auto;$('#oAns').checked=st.showAns;shown=st.showAns;$('#oShuf').checked=st.shuf;
   $('#oVoiceRate').value=st.voiceRate;$('#oVoiceVolume').value=st.voiceVolume;$('#oVoicePitch').value=st.voicePitch;
   $('#voiceRateVal').textContent=Number(st.voiceRate).toFixed(1)+'×';$('#voiceVolumeVal').textContent=Math.round(st.voiceVolume*100)+'%';$('#voicePitchVal').textContent=Math.round(st.voicePitch*100)+'%';
