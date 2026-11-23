@@ -12,10 +12,10 @@ button:hover{border-color:var(--acc)}
 button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 #bar{position:fixed;top:0;left:0;height:3px;background:var(--acc);width:0;transition:width .25s;z-index:5}
 header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px}
-#pos{font-variant-numeric:tabular-nums;color:var(--mute);margin-top:12px;text-align:center}
+#pos{font-variant-numeric:tabular-nums;color:var(--mute);margin:12px 0 auto;text-align:center;flex-shrink:0}
 #pos b{color:var(--ink);font-size:1.15em}
-main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 16px;overflow:auto;touch-action:pan-y}
-#card{width:max-content;max-width:calc(100vw - 160px);background:var(--card);border-radius:14px;border-top:5px solid var(--acc);padding:22px clamp(18px,5vw,44px) 26px;box-shadow:0 1px 0 var(--line),0 12px 30px -18px rgba(0,0,0,.35)}
+main{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;padding:8px 16px 16px;overflow:auto;touch-action:pan-y}
+#card{width:max-content;max-width:calc(100vw - 160px);margin-top:auto;flex-shrink:0;background:var(--card);border-radius:14px;border-top:5px solid var(--acc);padding:22px clamp(18px,5vw,44px) 26px;box-shadow:0 1px 0 var(--line),0 12px 30px -18px rgba(0,0,0,.35)}
 .acts{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
 .acts button{padding:.3em .75em;font-size:.88rem}
 .acts button.on{background:var(--acc);color:var(--accink);border-color:var(--acc)}
